@@ -1,21 +1,49 @@
 'use strict';
-const services = require('../services/services');
-const parseBoolean = require('../utils').parseBoolean
 
-module.exports = function (app) {
+const {
+  getThread,
+  getThreads,
+  postThread,
+  reportThread,
+  deleteThread
+} = require('../controllers/threadsControllers');
 
-  app.route('/api/stock-prices')
-    .get(async(req, res) => {
-      try{
-        const { like } = req.query;
-        if(!parseBoolean(like)){
-          await services.getPricesWithoutLike(req, res);
-        }else{
-          await services.getPricesWithLike(req, res);
-        }
-      }catch{
-        res.status(500).send("Internal Server Error")
-      }
-    });
-    
+const {
+  getReply,
+  getReplies,
+  postReply,
+  reportReply,
+  deleteReply
+} = require('../controllers/repliesControllers');
+
+module.exports = function(app) {
+
+  app.route('/api/threads/:board')
+    .get(async function(req, res) {
+      await getThreads(req, res);
+    })
+    .post(async function(req, res) {
+      await postThread(req, res);
+    })
+    .put(async function(req, res) {
+      await reportThread(req, res);
+    })
+    .delete(async function(req, res) {
+      await deleteThread(req, res);
+    })
+
+  app.route('/api/replies/:board')
+    .get(async function(req, res) {
+      await getReplies(req, res);
+    })
+    .post(async function(req, res) {
+      await postReply(req, res)
+    })
+    .delete(async function(req, res) {
+      await deleteReply(req, res);
+    })
+    .put(async function(req, res) {
+      await reportReply(req, res);
+    })
+
 };
